@@ -27,13 +27,31 @@ export const addProducts = createAsyncThunk('addProducts/getProducts', async (pr
 		};
 	}
 });
+
+export const editProducts = createAsyncThunk(
+	'editProducts/getProducts',
+	async ({ product, _id }) => {
+		const res = await fetch(`http://localhost:5000/product/${_id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(product),
+		});
+		const data = await res.json();
+		if (data.acknowledged) {
+			return product;
+		}
+	}
+);
+
 export const deleteProducts = createAsyncThunk('deleteProducts/getProducts', async (id) => {
 	const res = await fetch(`http://localhost:5000/product/${id}`, {
 		method: 'DELETE',
 	});
 	const data = await res.json();
 
-	return id;
+	if (data.acknowledged) {
+		return id;
+	}
 });
 
 const productsSlice = createSlice({
@@ -64,11 +82,19 @@ const productsSlice = createSlice({
 			})
 			.addCase(deleteProducts.pending, (state, action) => {
 				state.isLoading = true;
-				state.products = state.products.filter((product) => product._id !== action.payload);
 			})
 			.addCase(deleteProducts.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.products = state.products.filter((product) => product._id !== action.payload);
+			})
+			.addCase(editProducts.pending, (state, action) => {
+				state.isLoading = true;
+			})
+			.addCase(editProducts.fulfilled, (state, action) => {
+				state.isLoading = false;
+				// const updatedProduct = state.products.find((product) => product._id === action.payload._id);
+				state.products = state.products.filter((product) => product._id !== action.payload._id);
+				state.products.push(action.payload);
 			});
 	},
 });
