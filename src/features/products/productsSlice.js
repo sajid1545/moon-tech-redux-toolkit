@@ -27,6 +27,14 @@ export const addProducts = createAsyncThunk('addProducts/getProducts', async (pr
 		};
 	}
 });
+export const deleteProducts = createAsyncThunk('deleteProducts/getProducts', async (id) => {
+	const res = await fetch(`http://localhost:5000/product/${id}`, {
+		method: 'DELETE',
+	});
+	const data = await res.json();
+
+	return id;
+});
 
 const productsSlice = createSlice({
 	name: 'products',
@@ -53,6 +61,14 @@ const productsSlice = createSlice({
 			.addCase(addProducts.fulfilled, (state, action) => {
 				state.isLoading = false;
 				state.products.push(action.payload);
+			})
+			.addCase(deleteProducts.pending, (state, action) => {
+				state.isLoading = true;
+				state.products = state.products.filter((product) => product._id !== action.payload);
+			})
+			.addCase(deleteProducts.fulfilled, (state, action) => {
+				state.isLoading = false;
+				state.products = state.products.filter((product) => product._id !== action.payload);
 			});
 	},
 });
