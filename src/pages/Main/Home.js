@@ -2,24 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ProductCard from '../../components/ProductCard';
 import { toggleBrands, toggleStock } from '../../features/filter/filter';
+import { getProducts } from '../../features/products/productsSlice';
 
 const Home = () => {
-	const [products, setProducts] = useState([]);
-
-	useEffect(() => {
-		fetch('http://localhost:5000/products')
-			.then((res) => res.json())
-			.then((data) => setProducts(data.data));
-	}, []);
+	const dispatch = useDispatch();
 
 	const activeClass = 'text-white  bg-indigo-500 border-white';
 
 	const filters = useSelector((state) => state.filter);
+	const { products, isLoading } = useSelector((state) => state.products);
 	const { brands, stock } = filters;
-
-	const dispatch = useDispatch();
-
 	let content;
+
+	if (isLoading) {
+		content = <h1 className='text-3xl font-bold text-center'>Loading.....</h1>;
+	}
+
+	useEffect(() => {
+		dispatch(getProducts());
+	}, [dispatch]);
 
 	if (products.length) {
 		content = products.map((product) => <ProductCard key={product._id} product={product} />);
