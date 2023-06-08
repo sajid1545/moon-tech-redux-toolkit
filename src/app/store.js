@@ -1,4 +1,3 @@
-import logger from 'redux-logger';
 import cartSlice from '../features/cart/cartSlice';
 import productsSlice from '../features/products/productsSlice';
 import filterSlice from './../features/filter/filter';
