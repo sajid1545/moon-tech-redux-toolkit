@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import ProductCard from "../../components/ProductCard";
 
 const Home = () => {
@@ -11,6 +12,8 @@ const Home = () => {
   }, []);
 
   const activeClass = "text-white  bg-indigo-500 border-white";
+
+  const dispatch = useDispatch()
 
   return (
     <div className='max-w-7xl gap-14 mx-auto my-10'>
