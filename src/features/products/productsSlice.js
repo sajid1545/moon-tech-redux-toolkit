@@ -13,7 +13,7 @@ export const getProducts = createAsyncThunk('products/getProducts', async () => 
 	return data.data;
 });
 
-export const addProducts = createAsyncThunk('addProducts/getProducts', async (product) => {
+export const addProducts = createAsyncThunk('products/addProducts', async (product) => {
 	const res = await fetch('http://localhost:5000/product', {
 		method: 'POST',
 		headers: { 'content-type': 'application/json' },
@@ -28,22 +28,19 @@ export const addProducts = createAsyncThunk('addProducts/getProducts', async (pr
 	}
 });
 
-export const editProducts = createAsyncThunk(
-	'editProducts/getProducts',
-	async ({ product, _id }) => {
-		const res = await fetch(`http://localhost:5000/product/${_id}`, {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(product),
-		});
-		const data = await res.json();
-		if (data.acknowledged) {
-			return product;
-		}
+export const editProducts = createAsyncThunk('products/editProducts', async ({ product, _id }) => {
+	const res = await fetch(`http://localhost:5000/product/${_id}`, {
+		method: 'PATCH',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(product),
+	});
+	const data = await res.json();
+	if (data.acknowledged) {
+		return product;
 	}
-);
+});
 
-export const deleteProducts = createAsyncThunk('deleteProducts/getProducts', async (id) => {
+export const deleteProducts = createAsyncThunk('products/deleteProducts', async (id) => {
 	const res = await fetch(`http://localhost:5000/product/${id}`, {
 		method: 'DELETE',
 	});
