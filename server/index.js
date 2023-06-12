@@ -35,12 +35,18 @@ const run = async () => {
 
 			res.send(result);
 		});
-		
-		app.patch('/product/:id', async (req, res) => {
+
+		app.put('/product/:id', async (req, res) => {
 			const id = req.params.id;
 			const product = req.body;
 
-			const result = await productCollection.updateOne({ _id: ObjectId(id) }, { $set: product });
+			const options = { upsert: true };
+
+			const result = await productCollection.updateOne(
+				{ _id: ObjectId(id) },
+				{ $set: product },
+				options
+			);
 
 			res.send(result);
 		});

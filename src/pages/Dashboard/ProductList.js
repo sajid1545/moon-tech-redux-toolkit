@@ -1,17 +1,35 @@
 import React, { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { AiFillEdit } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { deleteProducts, getProducts } from '../../features/products/productsSlice';
+import {
+	getProducts,
+	removeProduct,
+	toggleDeleteSuccess,
+} from '../../features/products/productsSlice';
 
 const ProductList = () => {
 	const dispatch = useDispatch();
 
-	const { products, isLoading } = useSelector((state) => state.products);
+	const { products, isLoading, isError, deleteSuccess, error } = useSelector(
+		(state) => state.products
+	);
 
 	useEffect(() => {
 		dispatch(getProducts());
 	}, [dispatch]);
+
+	useEffect(() => {
+		if (!isLoading && deleteSuccess) {
+			toast.success('Product deleted successfully');
+			dispatch(toggleDeleteSuccess());
+		}
+	}, [dispatch, isLoading, deleteSuccess]);
+
+	if (isLoading) {
+		return <p>Loading...</p>;
+	}
 
 	return (
 		<div className="flex flex-col justify-center items-center h-full w-full ">
@@ -75,7 +93,7 @@ const ProductList = () => {
 													<AiFillEdit />{' '}
 												</button>
 											</Link>
-											<button onClick={() => dispatch(deleteProducts(_id))}>
+											<button onClick={() => dispatch(removeProduct(_id))}>
 												<svg
 													className="w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1"
 													fill="none"

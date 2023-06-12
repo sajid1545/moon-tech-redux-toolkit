@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { fetchProducts, postProduct } from './productsAPI';
+import { deleteProduct, fetchProducts, postProduct, updateProduct } from './productsAPI';
 
 const initialState = {
 	products: [],
@@ -7,6 +7,8 @@ const initialState = {
 	isError: false,
 	errorMessage: '',
 	postSuccess: false,
+	deleteSuccess: false,
+	updateSuccess: false,
 };
 
 export const getProducts = createAsyncThunk('products/getProducts', async () => {
@@ -19,27 +21,15 @@ export const addProduct = createAsyncThunk('products/addProduct', async (product
 	return products;
 });
 
-export const editProducts = createAsyncThunk('products/editProducts', async ({ product, _id }) => {
-	const res = await fetch(`http://localhost:5000/product/${_id}`, {
-		method: 'PATCH',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(product),
-	});
-	const data = await res.json();
-	if (data.acknowledged) {
-		return product;
-	}
+export const editProduct = createAsyncThunk('products/editProduct', async ({ product, _id }) => {
+	const products = updateProduct({ product, _id });
+	return products;
 });
 
-export const deleteProducts = createAsyncThunk('products/deleteProducts', async (id) => {
-	const res = await fetch(`http://localhost:5000/product/${id}`, {
-		method: 'DELETE',
-	});
-	const data = await res.json();
-
-	if (data.acknowledged) {
-		return id;
-	}
+export const removeProduct = createAsyncThunk('products/removeProduct', async (id, thunkAPI) => {
+	const products = deleteProduct(id);
+	thunkAPI.dispatch(removeProductFromList(id));
+	return products;
 });
 
 const productsSlice = createSlice({
@@ -48,6 +38,16 @@ const productsSlice = createSlice({
 	reducers: {
 		togglePostSuccess: (state) => {
 			state.postSuccess = false;
+		},
+		toggleDeleteSuccess: (state) => {
+			state.deleteSuccess = false;
+		},
+		toggleUpdateSuccess: (state) => {
+			state.updateSuccess = false;
+		},
+
+		removeProductFromList: (state, action) => {
+			state.products = state.products.filter((product) => product._id !== action.payload);
 		},
 	},
 	extraReducers: (builder) => {
@@ -83,25 +83,57 @@ const productsSlice = createSlice({
 				state.postSuccess = false;
 				state.errorMessage = action.error.message;
 			})
-
-			.addCase(deleteProducts.pending, (state, action) => {
+			.addCase(removeProduct.pending, (state) => {
 				state.isLoading = true;
+				state.isError = false;
+				state.deleteSuccess = false;
 			})
-			.addCase(deleteProducts.fulfilled, (state, action) => {
+			.addCase(removeProduct.fulfilled, (state, action) => {
 				state.isLoading = false;
-				state.products = state.products.filter((product) => product._id !== action.payload);
+				state.isError = false;
+				state.deleteSuccess = true;
 			})
-			.addCase(editProducts.pending, (state, action) => {
+			.addCase(removeProduct.rejected, (state, action) => {
+				state.isLoading = false;
+				state.isError = true;
+				state.products = [];
+				state.deleteSuccess = false;
+				state.errorMessage = action.error.message;
+			})
+			.addCase(editProduct.pending, (state) => {
 				state.isLoading = true;
+				state.isError = false;
+				state.updateSuccess = false;
 			})
-			.addCase(editProducts.fulfilled, (state, action) => {
+			.addCase(editProduct.fulfilled, (state, action) => {
 				state.isLoading = false;
-				// const updatedProduct = state.products.find((product) => product._id === action.payload._id);
-				state.products = state.products.filter((product) => product._id !== action.payload._id);
-				state.products.push(action.payload);
+				state.isError = false;
+				state.updateSuccess = true;
+			})
+			.addCase(editProduct.rejected, (state, action) => {
+				state.isLoading = false;
+				state.isError = true;
+				state.products = [];
+				state.updateSuccess = false;
+				state.errorMessage = action.error.message;
 			});
+
+		// .addCase(editProduct.pending, (state, action) => {
+		// 	state.isLoading = true;
+		// })
+		// .addCase(editProduct.fulfilled, (state, action) => {
+		// 	state.isLoading = false;
+		// 	// const updatedProduct = state.products.find((product) => product._id === action.payload._id);
+		// 	state.products = state.products.filter((product) => product._id !== action.payload._id);
+		// 	state.products.push(action.payload);
+		// });
 	},
 });
 
-export const { togglePostSuccess } = productsSlice.actions;
+export const {
+	togglePostSuccess,
+	toggleDeleteSuccess,
+	removeProductFromList,
+	toggleUpdateSuccess,
+} = productsSlice.actions;
 export default productsSlice.reducer;
