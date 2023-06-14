@@ -1,23 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
+import { useGetProductsQuery, useUpdateProductMutation } from '../../features/api/apiSlice';
 
 const EditProduct = () => {
 	const { register, handleSubmit } = useForm();
 	const location = useLocation();
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
-
 	const productID = location.state;
-	const product = useSelector((state) => state.products.products);
+	const { data, isLoading } = useGetProductsQuery();
+	const products = data?.data;
+	const [updateProduct, { isLoading: updateLoading, isSuccess }] = useUpdateProductMutation();
 
-	const editableProduct = product.find((product) => product._id === productID);
+	useEffect(() => {
+		if (updateLoading) {
+			toast.loading('Updating product', { id: 'updateProduct' });
+		}
+		if (isSuccess) {
+			toast.success('Updated product', { id: 'updateProduct' });
+		}
+	}, [updateLoading, isSuccess]);
+
+	if (isLoading) {
+		return <h1>Loading...</h1>;
+	}
+
+	const editableProduct = products?.find((product) => product._id === productID);
 
 	const { _id, model, brand, image, price, status, spec, keyFeature } = editableProduct;
-
-
-	
 
 	const submit = (data) => {
 		const product = {
@@ -29,6 +39,7 @@ const EditProduct = () => {
 			keyFeature: [data.keyFeature1, data.keyFeature2, data.keyFeature3, data.keyFeature4],
 			spec: [],
 		};
+		updateProduct({ product, _id });
 	};
 
 	return (

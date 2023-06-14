@@ -14,6 +14,7 @@ const AddProduct = () => {
 		}
 		if (isError) {
 			toast.error(error, { id: 'addProduct' });
+			<h1>Error</h1>;
 		}
 
 		if (isSuccess) {

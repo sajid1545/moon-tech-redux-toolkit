@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 import { AiFillEdit } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
-import { useGetProductsQuery } from '../../features/api/apiSlice';
+import { useGetProductsQuery, useRemoveProductMutation } from '../../features/api/apiSlice';
 
 const ProductList = () => {
 	const { data, isLoading } = useGetProductsQuery();
 
 	const products = data?.data;
+
+	const [removeProduct, { isSuccess }] = useRemoveProductMutation();
+
+	useEffect(() => {
+		if (isSuccess) {
+			toast.success('Product deleted successfully');
+		}
+	}, [isSuccess]);
 
 	if (isLoading) {
 		return <p>Loading...</p>;
@@ -74,7 +83,7 @@ const ProductList = () => {
 													<AiFillEdit />{' '}
 												</button>
 											</Link>
-											<button>
+											<button onClick={() => removeProduct(_id)}>
 												<svg
 													className="w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1"
 													fill="none"
