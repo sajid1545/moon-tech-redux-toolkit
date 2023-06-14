@@ -1,14 +1,12 @@
 import React from 'react';
 import { AiFillEdit } from 'react-icons/ai';
-import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { useGetProductsQuery } from '../../features/api/apiSlice';
 
 const ProductList = () => {
-	const dispatch = useDispatch();
+	const { data, isLoading } = useGetProductsQuery();
 
-	const { products, isLoading, isError, deleteSuccess, error } = useSelector(
-		(state) => state.products
-	);
+	const products = data?.data;
 
 	if (isLoading) {
 		return <p>Loading...</p>;

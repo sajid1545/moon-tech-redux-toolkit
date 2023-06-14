@@ -1,22 +1,38 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'react-hot-toast';
+import { useAddProductMutation } from '../../features/api/apiSlice';
 
 const AddProduct = () => {
 	const { register, handleSubmit, reset } = useForm();
 
-	
+	const [addProduct, { isLoading, isSuccess, isError, error }] = useAddProductMutation();
 
-	
+	useEffect(() => {
+		if (isLoading) {
+			toast.loading('Adding product...', { id: 'addProduct' });
+		}
+		if (isError) {
+			toast.error(error, { id: 'addProduct' });
+		}
+
+		if (isSuccess) {
+			toast.success('Product added successfully!', { id: 'addProduct' });
+			reset();
+		}
+	}, [isLoading, isError, error, isSuccess, reset]);
+
 	const submit = (data) => {
 		const product = {
 			model: data.model,
 			brand: data.brand,
 			status: data.status === 'true' ? true : false,
 			price: data.price,
+			image: data.image,
 			keyFeature: [data.keyFeature1, data.keyFeature2, data.keyFeature3, data.keyFeature4],
 			spec: [],
 		};
-
+		addProduct(product);
 	};
 
 	return (
@@ -48,7 +64,7 @@ const AddProduct = () => {
 				</div>
 				<div className="flex flex-col w-full max-w-xs">
 					<label className="mb-2" htmlFor="price">
-						Image
+						Price
 					</label>
 					<input type="text" name="price" id="price" {...register('price')} />
 				</div>
