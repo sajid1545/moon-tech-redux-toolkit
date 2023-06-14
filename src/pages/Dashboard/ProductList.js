@@ -1,13 +1,7 @@
-import React, { useEffect } from 'react';
-import { toast } from 'react-hot-toast';
+import React from 'react';
 import { AiFillEdit } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import {
-	getProducts,
-	removeProduct,
-	toggleDeleteSuccess,
-} from '../../features/products/productsSlice';
 
 const ProductList = () => {
 	const dispatch = useDispatch();
@@ -15,17 +9,6 @@ const ProductList = () => {
 	const { products, isLoading, isError, deleteSuccess, error } = useSelector(
 		(state) => state.products
 	);
-
-	useEffect(() => {
-		dispatch(getProducts());
-	}, [dispatch]);
-
-	useEffect(() => {
-		if (!isLoading && deleteSuccess) {
-			toast.success('Product deleted successfully');
-			dispatch(toggleDeleteSuccess());
-		}
-	}, [dispatch, isLoading, deleteSuccess]);
 
 	if (isLoading) {
 		return <p>Loading...</p>;
@@ -93,7 +76,7 @@ const ProductList = () => {
 													<AiFillEdit />{' '}
 												</button>
 											</Link>
-											<button onClick={() => dispatch(removeProduct(_id))}>
+											<button>
 												<svg
 													className="w-8 h-8 hover:text-blue-600 rounded-full hover:bg-gray-100 p-1"
 													fill="none"

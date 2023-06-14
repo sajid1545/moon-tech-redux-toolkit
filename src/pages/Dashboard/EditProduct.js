@@ -1,9 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { editProduct, toggleUpdateSuccess } from '../../features/products/productsSlice';
 
 const EditProduct = () => {
 	const { register, handleSubmit } = useForm();
@@ -18,15 +16,8 @@ const EditProduct = () => {
 
 	const { _id, model, brand, image, price, status, spec, keyFeature } = editableProduct;
 
-	const { isLoading, updateSuccess } = useSelector((state) => state.products);
 
-	useEffect(() => {
-		if (!isLoading && updateSuccess) {
-			toast.success('Product updated successfully', { id: 'updateProduct' });
-			dispatch(toggleUpdateSuccess());
-			navigate('/dashboard');
-		}
-	}, [isLoading, updateSuccess, dispatch, navigate]);
+	
 
 	const submit = (data) => {
 		const product = {
@@ -38,7 +29,6 @@ const EditProduct = () => {
 			keyFeature: [data.keyFeature1, data.keyFeature2, data.keyFeature3, data.keyFeature4],
 			spec: [],
 		};
-		dispatch(editProduct({ product, _id }));
 	};
 
 	return (
